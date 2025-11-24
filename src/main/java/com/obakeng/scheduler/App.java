@@ -1,26 +1,35 @@
 package com.obakeng.scheduler;
 
+import com.obakeng.scheduler.model.CalendarModel;
+import com.obakeng.scheduler.ui.CalendarView;
 import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.control.Label;
+import javafx.scene.Scene;  
 import javafx.stage.Stage;
 
+/**
+ * Entry point of the Scheduler Application.
+ */
 public class App extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        Label label = new Label("Hello, Scheduler!");
-        Scene scene = new Scene(label, 400, 200);
-        primaryStage.setScene(scene);
+        CalendarModel calendarModel = new CalendarModel();
+        calendarModel.loadTasks(); // Load tasks from storage
+        CalendarView calendarView = new CalendarView(calendarModel);
+
+        Scene scene = new Scene(calendarView, 800, 600);
+
         primaryStage.setTitle("Scheduler Application");
+        primaryStage.setScene(scene);
         primaryStage.show();
     }
 
+    /**
+     * Standard Java entry point.
+     * Delegates to the JavaFX runtime which will eventually call start().
+     * @param args
+    */
     public static void main(String[] args) {
         launch(args);
     }
-}
-
-public class App {
-
 }
