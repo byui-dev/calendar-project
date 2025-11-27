@@ -9,6 +9,10 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListCell;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+import javafx.beans.binding.BooleanBinding;
+
+import java.util.function.Consumer;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -29,66 +33,72 @@ public class TaskListView extends VBox {
         this.listView = new ListView<>();
         this.getChildren().add(listView);
 
-        // Custom cell factory for styling
+        // Custom cell factory for styling. Use a Text node and CSS classes
+        // instead of inline styles so styling is centralized in a stylesheet.
         listView.setCellFactory(lv -> new ListCell<Task>() {
+            private final Text text = new Text();
+
             @Override
             protected void updateItem(Task task, boolean empty) {
                 super.updateItem(task, empty);
                 if (empty || task == null) {
                     setText(null);
-                    setStyle("");
+                    setGraphic(null);
                 } else {
-                    setText(task.toString());
+                    text.setText(task.toString());
+                    // Ensure the style class is kept in sync with completion state
+                    text.getStyleClass().remove("task-completed");
                     if (task.isCompleted()) {
-                         // Gray text + strike-through for completed tasks
-                         setStyle("-fx-text-fill: gray; -fx-strikethrough: true;");
-                    } else {
-                        // Normal Style for incomplete tasks
-                        setStyle("-fx-text-fill: black; -fx-strikethrough: false;");
+                        text.getStyleClass().add("task-completed");
                     }
+                    setText(null); // we use graphic instead
+                    setGraphic(text);
                 }
             }
         });
 
         ContextMenu contextMenu = new ContextMenu();
 
-        // Mark Completed option
+        // Helper to perform an action on the selected task and refresh view
+        // Reduces duplication for mark/delete actions.
+        Consumer<Task> refreshingAction = t -> showTasks(currentDate);
+
         MenuItem markCompleted = new MenuItem("Mark Completed");
-        markCompleted.setOnAction(e -> {
-            Task selectedTask = listView.getSelectionModel().getSelectedItem();
-            if (selectedTask != null && currentDate != null) {
-                model.markTaskCompleted(currentDate, selectedTask);
-                showTasks(currentDate);
-            }
-        });
+        markCompleted.setOnAction(e -> operateOnSelectedTask(t -> {
+            model.markTaskCompleted(currentDate, t);
+            refreshingAction.accept(t);
+        }));
 
-        // Mark Incomplete option
         MenuItem markIncomplete = new MenuItem("Mark Incomplete");
-        markIncomplete.setOnAction(e -> {
-            Task selectedTask = listView.getSelectionModel().getSelectedItem();
-            if (selectedTask != null && currentDate != null) {
-                model.markTaskIncomplete(currentDate, selectedTask);
-                showTasks(currentDate);
-            }
-        });
+        markIncomplete.setOnAction(e -> operateOnSelectedTask(t -> {
+            model.markTaskIncomplete(currentDate, t);
+            refreshingAction.accept(t);
+        }));
 
-        // Delete Task option with confirmation
         MenuItem deleteTask = new MenuItem("Delete Task");
         deleteTask.setOnAction(e -> {
-            Task selectedTask = listView.getSelectionModel().getSelectedItem();
-            if (selectedTask != null && currentDate != null) {
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle("Delete Task");
-                alert.setHeaderText("Are you sure you want to delete this task?");
-                alert.setContentText(selectedTask.toString());
-
-                Optional<ButtonType> result = alert.showAndWait();
-                if (result.isPresent() && result.get() == ButtonType.OK) {
-                    model.deleteTask(currentDate, selectedTask);
-                    showTasks(currentDate);
-                }
+            Task sel = listView.getSelectionModel().getSelectedItem();
+            if (sel == null || currentDate == null) return;
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Delete Task");
+            alert.setHeaderText("Are you sure you want to delete this task?");
+            alert.setContentText(sel.toString());
+            // If possible, set the owner so dialogs are centered on the app window
+            if (getScene() != null && getScene().getWindow() != null) {
+                alert.initOwner(getScene().getWindow());
+            }
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                model.deleteTask(currentDate, sel);
+                showTasks(currentDate);
             }
         });
+
+        // Disable menu items when nothing is selected
+        BooleanBinding noSelection = listView.getSelectionModel().selectedItemProperty().isNull();
+        markCompleted.disableProperty().bind(noSelection);
+        markIncomplete.disableProperty().bind(noSelection);
+        deleteTask.disableProperty().bind(noSelection);
 
         // Add all three menu items
         contextMenu.getItems().addAll(markCompleted, markIncomplete, deleteTask);
@@ -97,12 +107,22 @@ public class TaskListView extends VBox {
 
     public void showTasks(LocalDate date) {
         currentDate = date;
-        listView.getItems().clear();
-        List<Task> tasks = model.getTasks(date);
-        listView.getItems().addAll(tasks);
+        // Replace the list contents with tasks for the selected date.
+        // For a future improvement we could expose an ObservableList from the model
+        // and bind directly to it so changes are reflected automatically.
+        listView.getItems().setAll(model.getTasks(date));
     }
 
     public void setDate(LocalDate date) {
         showTasks(date);
+    }
+
+    // Helper to run an action on the currently selected task and refresh view
+    private void operateOnSelectedTask(Consumer<Task> action) {
+        Task sel = listView.getSelectionModel().getSelectedItem();
+        if (sel != null && currentDate != null) {
+            action.accept(sel);
+            showTasks(currentDate);
+        }
     }
 }

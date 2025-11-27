@@ -22,5 +22,13 @@
       "priority": "Medium",
       "completed": false
     }
+  ],
+  "2025-12-01": [
+    {
+      "title": "Study",
+      "dateTime": "2025-12-01T10:30",
+      "priority": "High",
+      "completed": false
+    }
   ]
 }

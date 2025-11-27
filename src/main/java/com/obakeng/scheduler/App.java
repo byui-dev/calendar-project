@@ -18,6 +18,13 @@ public class App extends Application {
 
         Scene scene = new Scene(calendarView, 800, 600);
 
+        // Attach application stylesheet (placed in src/main/resources/styles.css)
+        try {
+            scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
+        } catch (Exception ignored) {
+            // If the stylesheet isn't found at runtime, continue without it.
+        }
+
         primaryStage.setTitle("Scheduler Application");
         primaryStage.setScene(scene);
         primaryStage.show();
