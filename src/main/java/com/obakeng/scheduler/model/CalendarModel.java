@@ -104,6 +104,7 @@ public class CalendarModel {
         }
     }
 
+    
     // Load tasks from JSON file
     private void loadTasks() {
         try (Reader reader = new FileReader(FILE_NAME)) {
