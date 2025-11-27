@@ -1,1 +1,26 @@
-{"2025-11-28":[{"title":"Go to the chapel","dateTime"
+{
+  "2025-11-30": [
+    {
+      "title": "Go to Church",
+      "dateTime": "2025-11-30T09:00",
+      "priority": "Medium",
+      "completed": false
+    }
+  ],
+  "2025-11-29": [
+    {
+      "title": "Return from the temple",
+      "dateTime": "2025-11-29T14:00",
+      "priority": "Medium",
+      "completed": true
+    }
+  ],
+  "2025-11-28": [
+    {
+      "title": "Go to the temple",
+      "dateTime": "2025-11-28T05:00",
+      "priority": "Medium",
+      "completed": false
+    }
+  ]
+}

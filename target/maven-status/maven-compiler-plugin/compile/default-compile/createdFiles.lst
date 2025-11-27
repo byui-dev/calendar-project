@@ -1,7 +1,10 @@
+com\obakeng\scheduler\model\CalendarModel$LocalDateTimeAdapter.class
 com\obakeng\scheduler\model\CalendarModel$1.class
 com\obakeng\scheduler\ui\TaskListView.class
+com\obakeng\scheduler\model\CalendarModel$LocalDateAdapter.class
 com\obakeng\scheduler\model\CalendarModel.class
 com\obakeng\scheduler\model\Task.class
+com\obakeng\scheduler\ui\TaskListView$1.class
 com\obakeng\scheduler\App.class
 com\obakeng\scheduler\ui\TaskForm.class
 com\obakeng\scheduler\ui\CalendarView.class

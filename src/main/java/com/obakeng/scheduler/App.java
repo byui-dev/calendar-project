@@ -14,7 +14,6 @@ public class App extends Application {
     @Override
     public void start(Stage primaryStage) {
         CalendarModel calendarModel = new CalendarModel();
-        calendarModel.loadTasks(); // Load tasks from storage
         CalendarView calendarView = new CalendarView(calendarModel);
 
         Scene scene = new Scene(calendarView, 800, 600);
