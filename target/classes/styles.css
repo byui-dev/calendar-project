@@ -1,0 +1,13 @@
+/* Styles for the Scheduler application */
+
+/* Visual style applied to completed task text nodes inside list cells */
+.task-completed {
+    -fx-fill: gray; /* text color for Text nodes */
+    -fx-strikethrough: true; /* visually indicate completion */
+    -fx-opacity: 0.9;
+}
+
+/* Optional: tweak list cell padding for readability */
+.list-cell {
+    -fx-padding: 6 8 6 8;
+}
